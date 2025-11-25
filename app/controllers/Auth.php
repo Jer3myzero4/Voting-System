@@ -107,8 +107,8 @@ public function send_confirmation_email($email, $token)
 
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
-        $mail->Username   = getenv('SMTP_USERNAME') ?: 'bsitjeremyfestin@gmail.com';
-        $mail->Password   = getenv('SMTP_PASSWORD') ?: 'mlfmsmkkuppbcjgf';
+        $mail->Username   = getenv('SMTP_USERNAME') ?: 'riorenzpacia24@gmail.com';
+        $mail->Password   = getenv('SMTP_PASSWORD') ?: 'qljz rbhf ysyb pbag';
         $mail->SMTPSecure = 'tls';
         $mail->Port       = 587;
 
@@ -361,8 +361,8 @@ private function send_password_token_to_email($email, $token) {
         $mail->isSMTP();
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
-        $mail->Username   = getenv('SMTP_USERNAME') ?: 'bsitjeremyfestin@gmail.com';
-        $mail->Password   = getenv('SMTP_PASSWORD') ?: 'mlfmsmkkuppbcjgf';
+        $mail->Username   = getenv('SMTP_USERNAME') ?: 'riorenzpacia24@gmail.com';
+        $mail->Password   = getenv('SMTP_PASSWORD') ?: 'qljz rbhf ysyb pbag';
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = 587;
 
