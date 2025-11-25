@@ -363,7 +363,7 @@ private function send_password_token_to_email($email, $token) {
         $mail->SMTPAuth   = true;
         $mail->Username   = getenv('SMTP_USERNAME') ?: 'bsitjeremyfestin@gmail.com';
         $mail->Password   = getenv('SMTP_PASSWORD') ?: 'mlfmsmkkuppbcjgf';
-        $mail->SMTPSecure = 'tls';
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = 587;
 
         $mail->setFrom(getenv('SMTP_USERNAME') ?: 'bsitjeremyfestin@gmail.com', 'Voting System Admin');
