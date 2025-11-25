@@ -58,14 +58,14 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 */
 
 $database['main'] = array(
-    'driver'	=> 'mysql',
-    'hostname'	=> 'localhost',
-    'port'		=> '3306',
-    'username'	=> 'root',
-    'password'	=> '',
-    'database'	=> 'votingSystemforhighschoolstudentofficerelections',
-    'charset'	=> 'utf8mb4',
-    'dbprefix'	=> '',
+    'driver'   => 'mysql',
+    'hostname' => getenv('DB_HOST') ?: 'sql12.freesqldatabase.com',
+    'port'     => getenv('DB_PORT') ?: '3306',
+    'username' => getenv('DB_USER') ?: 'sql12809249',
+    'password' => getenv('DB_PASS') ?: 'XWZfW7qYSd',
+    'database' => getenv('DB_NAME') ?: 'sql12809249',
+    'charset'  => 'utf8mb4',
+    'dbprefix' => ''
 );
 
 
