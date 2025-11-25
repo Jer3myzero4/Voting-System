@@ -107,12 +107,12 @@ public function send_confirmation_email($email, $token)
 
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
-        $mail->Username   = getenv('SMTP_USERNAME') ?: 'riorenzpacia24@gmail.com';
-        $mail->Password   = getenv('SMTP_PASSWORD') ?: 'qljz rbhf ysyb pbag';
+        $mail->Username   = getenv('SMTP_USERNAME') ?: 'bsitjeremyfestin@gmail.com';
+        $mail->Password   = getenv('SMTP_PASSWORD') ?: 'mlfmsmkkuppbcjgf';
         $mail->SMTPSecure = 'tls';
         $mail->Port       = 587;
 
-        $mail->setFrom(getenv('SMTP_USERNAME') ?: 'riorenzpacia24@gmail.com', 'Voting System Admin');
+        $mail->setFrom(getenv('SMTP_USERNAME') ?: 'bsitjeremyfestin@gmail.com', 'Voting System Admin');
         $mail->addAddress($email);
 
         $mail->isHTML(true);
@@ -361,12 +361,12 @@ private function send_password_token_to_email($email, $token) {
         $mail->isSMTP();
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
-        $mail->Username   = getenv('SMTP_USERNAME') ?: 'riorenzpacia24@gmail.com';
-        $mail->Password   = getenv('SMTP_PASSWORD') ?: 'qljz rbhf ysyb pbag';
+        $mail->Username   = getenv('SMTP_USERNAME') ?: 'bsitjeremyfestin@gmail.com';
+        $mail->Password   = getenv('SMTP_PASSWORD') ?: 'mlfmsmkkuppbcjgf';
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = 587;
 
-        $mail->setFrom(getenv('SMTP_USERNAME') ?: 'riorenzpacia24@gmail.com', 'Voting System Admin');
+        $mail->setFrom(getenv('SMTP_USERNAME') ?: 'bsitjeremyfestin@gmail.com', 'Voting System Admin');
         $mail->addAddress($email);
 
         $mail->isHTML(true);
