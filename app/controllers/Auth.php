@@ -20,10 +20,11 @@ class Auth extends Controller
     }  
 
 
-   public function register()
+     public function register()
 {
     if ($this->form_validation->submitted()) {
 
+        
         $fullname = $this->io->post('fullname');
         $email = $this->io->post('email');
         $password = $this->io->post('password');
@@ -33,7 +34,7 @@ class Auth extends Controller
         $role = $this->io->post('role');
         $email_token = bin2hex(random_bytes(50));
 
-        // Validation
+       
         $this->form_validation
             ->name('fullname')->required()
             ->name('email')->required()->is_unique('register', 'email', $email, 'Email is already registered.')
@@ -44,29 +45,21 @@ class Auth extends Controller
             ->name('role')->required();
 
         if ($this->form_validation->run()) {
-
+       
             $user_id = $this->lauth->register($fullname, $email, $password, $grade, $section, $role, $email_token);
-
             if ($user_id) {
-                // Try to send confirmation email
-                $email_sent = $this->send_confirmation_email($email, $email_token);
-
-                if ($email_sent) {
-                    $message_text = 'Your account has been created! Please check your email to confirm your account.';
-                } else {
-                    $message_text = 'Your account has been created, but we could not send a confirmation email. Please contact the admin.';
-                }
+             
+                $this->send_confirmation_email($email, $email_token);
 
                 $this->session->set_flashdata('notification', json_encode([
-                    'icon' => $email_sent ? 'success' : 'warning',
+                    'icon' => 'success',
                     'title' => 'Registration Successful',
-                    'text' => $message_text
+                    'text' => 'Your account has been created! Please check your email to confirm your account.'
                 ]));
 
                 redirect('/register');
-
             } else {
-                // DB error
+           
                 $this->session->set_flashdata('notification', json_encode([
                     'icon' => 'error',
                     'title' => 'Registration Failed',
@@ -74,19 +67,18 @@ class Auth extends Controller
                 ]));
                 redirect('/register');
             }
-
         } else {
-            // Validation errors
+           
             $this->session->set_flashdata('notification', json_encode([
                 'icon' => 'error',
                 'title' => 'Validation Error',
-                'text' => $this->form_validation->errors()
+                'text' => $this->form_validation->errors() 
             ]));
             redirect('/register');
         }
 
     } else {
-        // Show registration page
+
         $flash = [
             'notification' => $this->session->flashdata('notification') ?? null
         ];
@@ -106,52 +98,50 @@ class Auth extends Controller
 
 
    
-private function send_confirmation_email($email, $token)
+public function send_confirmation_email($email, $token)
 {
     $mail = new PHPMailer(true);
     try {
-        // Enable verbose debug output (remove in production)
-        $mail->SMTPDebug = 0; // Set 2 for debug
+        
         $mail->isSMTP();
-        $mail->Host       = 'smtp.gmail.com';       // Gmail SMTP server
+        $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
-        $mail->Username   = 'bsitjeremyfestin@gmail.com'; // Your Gmail
-        $mail->Password   = 'mlfmsmkkuppbcjgf';           // Your Gmail App Password
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // TLS encryption
-        $mail->Port       = 587;                         // TLS port
+        $mail->Username   = 'bsitjeremyfestin@gmail.com';
+        $mail->Password   = 'mlfmsmkkuppbcjgf'; 
+        $mail->SMTPSecure = 'tls';
+        $mail->Port       = 587;
 
-        // Sender & Recipient
         $mail->setFrom('bsitjeremyfestin@gmail.com', 'Voting System Admin');
         $mail->addAddress($email);
 
-        // Email format
         $mail->isHTML(true);
         $mail->Subject = 'Confirm Your Email Address';
 
-        $base = rtrim(base_url(), '/'); 
+      
+        $base = rtrim(base_url(), '/') . '/';
+
+        
         $confirm_url = $base . 'confirm_email/' . urlencode($token);
 
         $mail->Body = "
-            <h2>Welcome to Voting System for High School Student Officer Elections!</h2>
+            <h2>Welcome to Voting System For HighSchool Student Officer Elections!</h2>
             <p>Click the button below to confirm your email:</p>
             <a href='$confirm_url' style='background-color:#28a745;color:#fff;padding:10px 20px;text-decoration:none;border-radius:5px;'>Confirm Email</a>
             <p>If the button doesn’t work, copy this link into your browser:</p>
             <p>$confirm_url</p>
             <br>
-            <p>Thank you,<br>Voting System Admin</p>
+            <p>Thank you,<br>Voting System For HighSchool Student Official</p>
         ";
 
-        // Send email
         $mail->send();
-        error_log("✅ Confirmation email sent to: $email");
-        return true;
-
+        error_log("✅ Email sent to: " . $email);
     } catch (Exception $e) {
-        error_log("❌ Email could not be sent. PHPMailer Error: {$mail->ErrorInfo}");
-        return false;
+        error_log("❌ Email could not be sent. Error: {$mail->ErrorInfo}");
     }
 }
 
+
+    
 
 
 
