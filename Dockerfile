@@ -1,27 +1,39 @@
 # Use official PHP 8.2 with Apache
 FROM php:8.2-apache
 
-# Set working directory
-WORKDIR /var/www/html
+# -------------------------------
+# Install system dependencies & PHP extensions
+# -------------------------------
+RUN apt-get update && apt-get install -y \
+    libzip-dev \
+    unzip \
+    git \
+    && docker-php-ext-install pdo pdo_mysql
 
-# Install PDO MySQL and other required PHP extensions
-RUN docker-php-ext-install pdo pdo_mysql
-
-# Enable Apache mod_rewrite for .htaccess
+# -------------------------------
+# Enable Apache mod_rewrite
+# -------------------------------
 RUN a2enmod rewrite
 
-# Allow .htaccess overrides in Apache configuration
+# Allow .htaccess overrides
 RUN sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
 
-# Copy project files to container
+# -------------------------------
+# Copy application files including .env
+# -------------------------------
 COPY . /var/www/html/
 
-# Fix permissions for Apache user
+# Fix permissions
 RUN chown -R www-data:www-data /var/www/html \
-    && find /var/www/html -type d -exec chmod 755 {} \; \
-    && find /var/www/html -type f -exec chmod 644 {} \;
+    && chmod -R 755 /var/www/html \
+    && chmod 644 /var/www/html/.env
 
-# Expose port 80
+# -------------------------------
+# Expose port 80 for Apache
+# -------------------------------
 EXPOSE 80
 
-# Start Apache in foreground (default CMD in php:apache already handles this)
+# -------------------------------
+# Start Apache in the foreground
+# -------------------------------
+CMD ["apache2-foreground"]
