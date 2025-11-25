@@ -3,8 +3,10 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 
 require_once ROOT_DIR . '/vendor/autoload.php';
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
+use SendinBlue\Client\Api\TransactionalEmailsApi;
+use SendinBlue\Client\Configuration;
+use GuzzleHttp\Client;
+use SendinBlue\Client\Model\SendSmtpEmail;
 
 class Auth extends Controller
 {
@@ -100,47 +102,36 @@ class Auth extends Controller
    
 public function send_confirmation_email($email, $token)
 {
-    $mail = new PHPMailer(true);
+    $config = Configuration::getDefaultConfiguration()->setApiKey('api-key', getenv('BREVO_API_KEY'));
+    $apiInstance = new TransactionalEmailsApi(new Client(), $config);
+
+    $base = rtrim(base_url(), '/') . '/';
+    $confirm_url = $base . 'confirm_email/' . urlencode($token);
+
+    $emailContent = "
+        <h2>Welcome to Voting System For HighSchool Student Officer Elections!</h2>
+        <p>Click the button below to confirm your email:</p>
+        <a href='$confirm_url' style='background-color:#28a745;color:#fff;padding:10px 20px;text-decoration:none;border-radius:5px;'>Confirm Email</a>
+        <p>If the button doesn’t work, copy this link into your browser:</p>
+        <p>$confirm_url</p>
+        <br>
+        <p>Thank you,<br>Voting System For HighSchool Student Official</p>
+    ";
+
+    $sendSmtpEmail = new SendSmtpEmail([
+        'subject' => 'Confirm Your Email Address',
+        'sender' => ['name' => 'Voting System Admin', 'email' => 'noreply@yourdomain.com'],
+        'to' => [['email' => $email]],
+        'htmlContent' => $emailContent
+    ]);
+
     try {
-        
-        $mail->isSMTP();
-        $mail->Host       = 'smtp.gmail.com';
-        $mail->SMTPAuth   = true;
-        $mail->Username   = 'bsitjeremyfestin@gmail.com';
-        $mail->Password   = 'mlfmsmkkuppbcjgf'; 
-        $mail->SMTPSecure = 'tls';
-        $mail->Port       = 587;
-
-        $mail->setFrom('bsitjeremyfestin@gmail.com', 'Voting System Admin');
-        $mail->addAddress($email);
-
-        $mail->isHTML(true);
-        $mail->Subject = 'Confirm Your Email Address';
-
-      
-        $base = rtrim(base_url(), '/') . '/';
-
-        
-        $confirm_url = $base . 'confirm_email/' . urlencode($token);
-
-        $mail->Body = "
-            <h2>Welcome to Voting System For HighSchool Student Officer Elections!</h2>
-            <p>Click the button below to confirm your email:</p>
-            <a href='$confirm_url' style='background-color:#28a745;color:#fff;padding:10px 20px;text-decoration:none;border-radius:5px;'>Confirm Email</a>
-            <p>If the button doesn’t work, copy this link into your browser:</p>
-            <p>$confirm_url</p>
-            <br>
-            <p>Thank you,<br>Voting System For HighSchool Student Official</p>
-        ";
-
-        $mail->send();
-        error_log("✅ Email sent to: " . $email);
-    } catch (Exception $e) {
-        error_log("❌ Email could not be sent. Error: {$mail->ErrorInfo}");
+        $apiInstance->sendTransacEmail($sendSmtpEmail);
+        error_log("✅ Brevo Email sent to: " . $email);
+    } catch (\Exception $e) {
+        error_log("❌ Brevo Email error: " . $e->getMessage());
     }
 }
-
-
     
 
 
@@ -338,8 +329,8 @@ public function send_confirmation_email($email, $token)
 
 
 
-private function send_password_token_to_email($email, $token) {
-    
+private function send_password_token_to_email($email, $token)
+{
     $template_path = ROOT_DIR . '/public/templates/reset_password_email.html';
     if (!file_exists($template_path)) {
         error_log("Reset password template not found: {$template_path}");
@@ -347,38 +338,28 @@ private function send_password_token_to_email($email, $token) {
     }
 
     $template = file_get_contents($template_path);
+    $template = str_replace(['{token}', '{base_url}'], [$token, rtrim(base_url(), '/')], $template);
 
-   
-    $base = rtrim(base_url(), '/');
+    $config = Configuration::getDefaultConfiguration()->setApiKey('api-key', getenv('BREVO_API_KEY'));
+    $apiInstance = new TransactionalEmailsApi(new Client(), $config);
 
-  
-    $template = str_replace(['{token}', '{base_url}'], [$token, $base], $template);
+    $sendSmtpEmail = new SendSmtpEmail([
+        'subject' => 'Voting System Reset Password',
+        'sender' => ['name' => 'Voting System', 'email' => 'noreply@yourdomain.com'],
+        'to' => [['email' => $email]],
+        'htmlContent' => $template
+    ]);
 
-  
-    $mail = new PHPMailer(true);
     try {
-        $mail->isSMTP();
-        $mail->Host       = 'smtp.gmail.com';
-        $mail->SMTPAuth   = true;
-        $mail->Username   = 'bsitjeremyfestin@gmail.com'; 
-        $mail->Password   = 'mlfmsmkkuppbcjgf';   // Gmail App Password
-        $mail->SMTPSecure = 'tls';
-        $mail->Port       = 587;
-
-        $mail->setFrom('bsitjeremyfestin@gmail.com', 'Voting System');
-        $mail->addAddress($email);
-
-        $mail->isHTML(true);
-        $mail->Subject = 'Voting System Reset Password';
-        $mail->Body    = $template;
-
-        $mail->send();
+        $apiInstance->sendTransacEmail($sendSmtpEmail);
         return true;
-    } catch (Exception $e) {
-        error_log("Email could not be sent. Mailer Error: {$mail->ErrorInfo}");
+    } catch (\Exception $e) {
+        error_log("❌ Brevo Reset Password Email error: " . $e->getMessage());
         return false;
     }
 }
+
+
 public function password_reset() {
     if ($this->form_validation->submitted()) {
         $email = $this->io->post('email');
