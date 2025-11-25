@@ -21,7 +21,8 @@ class Auth extends Controller
     $mail->Host       = 'smtp.gmail.com';
     $mail->SMTPAuth   = true;
     $mail->Username   = 'bsitjeremyfestin@gmail.com';
-    $mail->Password   = 'mlfmsmkkuppbcjgf'; // Gmail App Password
+    $mail->Password   = 'ggiaprsfgtpfgswn'; // Gmail App Password
+                       
    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
     $mail->Port       = 465;
 
