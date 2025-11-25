@@ -121,7 +121,7 @@ public function send_confirmation_email($email, $token)
         $base = rtrim(base_url(), '/') . '/';
 
         
-        $confirm_url = $base . 'https://voting-system-50f6.onrender.com/confirm_email/' . urlencode($token);
+        $confirm_url = $base . 'confirm_email/' . urlencode($token);
 
         $mail->Body = "
             <h2>Welcome to Voting System For HighSchool Student Officer Elections!</h2>
