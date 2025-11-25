@@ -12,6 +12,26 @@ class Auth extends Controller
    
 
  
+    private function configure_smtp(PHPMailer $mail)
+    {
+        // SMTP setup
+        $mail->isSMTP();
+        $mail->Host       = 'smtp.gmail.com';          // Gmail SMTP server
+        $mail->SMTPAuth   = true;
+        $mail->Username   = 'bsitjeremyfestin@gmail.com'; // your Gmail
+        $mail->Password   = 'mlfmsmkkuppbcjgf';       // Gmail App Password
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // TLS encryption
+        $mail->Port       = 587;
+
+        // Sender
+        $mail->setFrom('bsitjeremyfestin@gmail.com', 'Voting System Admin');
+
+        // Debugging (optional)
+        $mail->SMTPDebug = 2; // 0 = off, 1 = commands, 2 = commands + data
+        $mail->Debugoutput = function($str, $level) {
+            error_log("SMTP Debug Level $level: $str");
+        };
+    }
 
    
 
@@ -99,74 +119,33 @@ class Auth extends Controller
 
    
 public function send_confirmation_email($email, $token)
-{
-    $mail = new PHPMailer(true);
-    try {
-        
-        $mail->isSMTP();
-        $mail->Host       = 'smtp.gmail.com';
-        $mail->SMTPAuth   = true;
-        $mail->Username   = 'bsitjeremyfestin@gmail.com';
-        $mail->Password   = 'mlfmsmkkuppbcjgf'; 
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port       = 587;
+    {
+        $mail = new PHPMailer(true);
+        try {
+            // use the private function here
+            $this->configure_smtp($mail);
 
-        $mail->setFrom('bsitjeremyfestin@gmail.com', 'Voting System Admin');
-        $mail->addAddress($email);
+            $mail->addAddress($email);
+            $mail->isHTML(true);
+            $mail->Subject = 'Confirm Your Email Address';
 
-        $mail->isHTML(true);
-        $mail->Subject = 'Confirm Your Email Address';
+            $base = rtrim(base_url(), '/') . '/';
+            $confirm_url = $base . 'confirm_email/' . urlencode($token);
 
-      
-        $base = rtrim(base_url(), '/') . '/';
+            $mail->Body = "
+                <h2>Welcome to Voting System!</h2>
+                <p>Click the button below to confirm your email:</p>
+                <a href='$confirm_url' style='padding:10px 20px;background-color:#28a745;color:#fff;text-decoration:none;'>Confirm Email</a>
+                <p>If the button doesn’t work, copy this link into your browser:</p>
+                <p>$confirm_url</p>
+            ";
 
-        
-        $confirm_url = $base . 'confirm_email/' . urlencode($token);
-
-        $mail->Body = "
-            <h2>Welcome to Voting System For HighSchool Student Officer Elections!</h2>
-            <p>Click the button below to confirm your email:</p>
-            <a href='$confirm_url' style='background-color:#28a745;color:#fff;padding:10px 20px;text-decoration:none;border-radius:5px;'>Confirm Email</a>
-            <p>If the button doesn’t work, copy this link into your browser:</p>
-            <p>$confirm_url</p>
-            <br>
-            <p>Thank you,<br>Voting System For HighSchool Student Official</p>
-        ";
-
-        $mail->send();
-        error_log("✅ Email sent to: " . $email);
-    } catch (Exception $e) {
-        error_log("❌ Email could not be sent. Error: {$mail->ErrorInfo}");
+            $mail->send();
+            error_log("✅ Email sent to: " . $email);
+        } catch (Exception $e) {
+            error_log("❌ Email could not be sent. Error: {$mail->ErrorInfo}");
+        }
     }
-}
-
-
-    
-
-
-
-
-
-
-
-
-
-
-    public function confirm_email($token)
-{
-    error_log("Confirm Email Token: " . $token);
-
-    $user = $this->lauth->activate_account($token);
-
-    if ($user) {
-        set_flash_alert('success', 'Your email has been confirmed. You can now log in.');
-        redirect('/login');
-    } else {
-        set_flash_alert('danger', 'Invalid or expired token.');
-        redirect('/login');
-    }
-}
-
  
     
 
@@ -338,8 +317,8 @@ public function send_confirmation_email($email, $token)
 
 
 
-private function send_password_token_to_email($email, $token) {
-    
+public function send_password_token_to_email($email, $token)
+{
     $template_path = ROOT_DIR . '/public/templates/reset_password_email.html';
     if (!file_exists($template_path)) {
         error_log("Reset password template not found: {$template_path}");
@@ -347,35 +326,22 @@ private function send_password_token_to_email($email, $token) {
     }
 
     $template = file_get_contents($template_path);
-
-   
     $base = rtrim(base_url(), '/');
-
-  
     $template = str_replace(['{token}', '{base_url}'], [$token, $base], $template);
 
-  
     $mail = new PHPMailer(true);
     try {
-        $mail->isSMTP();
-        $mail->Host       = 'smtp.gmail.com';
-        $mail->SMTPAuth   = true;
-        $mail->Username   = 'bsitjeremyfestin@gmail.com'; 
-        $mail->Password   = 'mlfmsmkkuppbcjgf';   // Gmail App Password
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port       = 587;
+        $this->configure_smtp($mail);
 
-        $mail->setFrom('bsitjeremyfestin@gmail.com', 'Voting System');
         $mail->addAddress($email);
-
         $mail->isHTML(true);
         $mail->Subject = 'Voting System Reset Password';
-        $mail->Body    = $template;
+        $mail->Body = $template;
 
         $mail->send();
         return true;
     } catch (Exception $e) {
-        error_log("Email could not be sent. Mailer Error: {$mail->ErrorInfo}");
+        error_log("❌ Email could not be sent. Error: {$mail->ErrorInfo}");
         return false;
     }
 }
