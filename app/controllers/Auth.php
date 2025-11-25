@@ -112,7 +112,7 @@ public function send_confirmation_email($email, $token)
         $mail->SMTPSecure = 'tls';
         $mail->Port       = 587;
 
-        $mail->setFrom(getenv('SMTP_USERNAME') ?: 'bsitjeremyfestin@gmail.com', 'Voting System Admin');
+        $mail->setFrom(getenv('SMTP_USERNAME') ?: 'riorenzpacia24@gmail.com', 'Voting System Admin');
         $mail->addAddress($email);
 
         $mail->isHTML(true);
@@ -366,7 +366,7 @@ private function send_password_token_to_email($email, $token) {
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = 587;
 
-        $mail->setFrom(getenv('SMTP_USERNAME') ?: 'bsitjeremyfestin@gmail.com', 'Voting System Admin');
+        $mail->setFrom(getenv('SMTP_USERNAME') ?: 'riorenzpacia24@gmail.com', 'Voting System Admin');
         $mail->addAddress($email);
 
         $mail->isHTML(true);
