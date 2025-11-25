@@ -6,6 +6,9 @@ require_once ROOT_DIR . '/vendor/autoload.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+
 class Auth extends Controller
 {
 
@@ -100,61 +103,46 @@ class Auth extends Controller
    
 public function send_confirmation_email($email, $token)
 {
-   
-    $mail = new PHPMailer(true);
+    // Create SendGrid email object
+    $emailObj = new \SendGrid\Mail\Mail();
+    $emailObj->setFrom(getenv('SENDGRID_FROM_EMAIL'), getenv('SENDGRID_FROM_NAME'));
+    $emailObj->setSubject('Confirm Your Email Address');
+    $emailObj->addTo($email);
+
+    $base = rtrim(base_url(), '/') . '/';
+    $confirm_url = $base . 'confirm_email/' . urlencode($token);
+
+    $emailObj->addContent(
+        "text/plain", 
+        "Welcome to Voting System For HighSchool Student Officer Elections!\n
+        Click this link to confirm your email: $confirm_url"
+    );
+
+    $emailObj->addContent(
+        "text/html", 
+        "<h2>Welcome to Voting System For HighSchool Student Officer Elections!</h2>
+        <p>Click the button below to confirm your email:</p>
+        <a href='$confirm_url' style='background-color:#28a745;color:#fff;padding:10px 20px;text-decoration:none;border-radius:5px;'>Confirm Email</a>
+        <p>If the button doesn’t work, copy this link into your browser:</p>
+        <p>$confirm_url</p>
+        <br>
+        <p>Thank you,<br>Voting System For HighSchool Student Official</p>"
+    );
+
+    // Initialize SendGrid
+    $sendgrid = new \SendGrid(getenv('SENDGRID_API_KEY'));
 
     try {
-        $mail->isSMTP();
-        $mail->Host       = getenv('SMTP_HOST') ?: 'smtp.gmail.com';
-        $mail->SMTPAuth   = true;
-        $mail->Username   = getenv('SMTP_USERNAME') ?: 'bsitjeremyfestin@gmail.com';
-        $mail->Password   = getenv('SMTP_PASSWORD') ?: 'mlfmsmkkuppbcjgf';
-        $mail->SMTPSecure = getenv('SMTP_SECURE') ?: 'tls';
-        $mail->Port       = getenv('SMTP_PORT') ?: 587;
-
-        
-        $mail->SMTPOptions = [
-        'ssl' => [
-                'verify_peer'       => false,
-                'verify_peer_name'  => false,
-                'allow_self_signed' => true
-            ]
-        ];
-
-        $mail->setFrom(
-            getenv('SMTP_USERNAME') ?: 'bsitjeremyfestin@gmail.com',
-            getenv('SMTP_FROM_NAME') ?: 'Voting System Admin'
-        );
-
-        $mail->addAddress($email);
-
-        $mail->isHTML(true);
-        $mail->Subject = 'Confirm Your Email Address';
-
-        $base = rtrim(base_url(), '/') . '/';
-        $confirm_url = $base . 'confirm_email/' . urlencode($token);
-
-        $mail->Body = "
-            <h2>Welcome to Voting System For HighSchool Student Officer Elections!</h2>
-            <p>Click the button below to confirm your email:</p>
-            <a href='$confirm_url' style='background-color:#28a745;color:#fff;padding:10px 20px;text-decoration:none;border-radius:5px;'>Confirm Email</a>
-            <p>If the button doesn’t work, copy this link into your browser:</p>
-            <p>$confirm_url</p>
-            <br>
-            <p>Thank you,<br>Voting System For HighSchool Student Official</p>
-        ";
-
-        $mail->send();
-        error_log("✅ Email sent to: " . $email);
-
+        $response = $sendgrid->send($emailObj);
+        if ($response->statusCode() == 202) {
+            error_log("✅ Email sent successfully to: " . $email);
+        } else {
+            error_log("❌ Email sending failed. Status Code: " . $response->statusCode());
+        }
     } catch (Exception $e) {
-        error_log("❌ Email could not be sent. Error: {$mail->ErrorInfo}");
+        error_log("❌ Exception while sending email: " . $e->getMessage());
     }
 }
-
-
-    
-
 
 
 
@@ -351,48 +339,44 @@ public function send_confirmation_email($email, $token)
 
 
 private function send_password_token_to_email($email, $token) {
-    
+    // Load template
     $template_path = ROOT_DIR . '/public/templates/reset_password_email.html';
     if (!file_exists($template_path)) {
         error_log("Reset password template not found: {$template_path}");
         return false;
     }
-
     $template = file_get_contents($template_path);
 
-   
+    // Replace placeholders in the template
     $base = rtrim(base_url(), '/');
-
-  
     $template = str_replace(['{token}', '{base_url}'], [$token, $base], $template);
 
-  
-    $mail = new PHPMailer(true);
+    // Create SendGrid email
+    $emailObj = new \SendGrid\Mail\Mail();
+    $emailObj->setFrom(getenv('SENDGRID_FROM_EMAIL'), getenv('SENDGRID_FROM_NAME'));
+    $emailObj->addTo($email);
+    $emailObj->setSubject('Voting System Reset Password');
+    $emailObj->addContent("text/html", $template);
+    $emailObj->addContent("text/plain", "Reset your password using this link: $base/reset_password/$token");
+
+    // Send email
+    $sendgrid = new \SendGrid(getenv('SENDGRID_API_KEY'));
+
     try {
-        $mail->isSMTP();
-        $mail->Host       = 'smtp.gmail.com';
-        $mail->SMTPAuth   = true;
-        $mail->Username   = getenv('SMTP_USERNAME') ?: 'bsitjeremyfestin@gmail.com';
-        $mail->Password   = getenv('SMTP_PASSWORD') ?: 'mlfmsmkkuppbcjgf';
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port       = 587;
-
-       
-
-        $mail->setFrom(getenv('SMTP_USERNAME') ?: 'bsitjeremyfestin@gmail.com', 'Voting System Admin');
-        $mail->addAddress($email);
-
-        $mail->isHTML(true);
-        $mail->Subject = 'Voting System Reset Password';
-        $mail->Body    = $template;
-
-        $mail->send();
-        return true;
+        $response = $sendgrid->send($emailObj);
+        if ($response->statusCode() == 202) {
+            error_log("✅ Reset password email sent to: " . $email);
+            return true;
+        } else {
+            error_log("❌ Failed to send reset password email. Status Code: " . $response->statusCode());
+            return false;
+        }
     } catch (Exception $e) {
-        error_log("Email could not be sent. Mailer Error: {$mail->ErrorInfo}");
+        error_log("❌ Exception while sending reset password email: " . $e->getMessage());
         return false;
     }
 }
+
 public function password_reset() {
     if ($this->form_validation->submitted()) {
         $email = $this->io->post('email');

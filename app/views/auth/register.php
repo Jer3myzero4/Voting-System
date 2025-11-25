@@ -38,7 +38,18 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
         <h2 class="text-3xl font-extrabold text-blue-700 mb-2 text-center md:text-left">Create Your Account</h2>
         <p class="text-gray-600 text-center md:text-left mb-4">Register now to join your school's online voting system</p>
 
-      
+        <?php if (!empty($notification)): ?>
+        <script>
+            const notif = <?= $notification ?>;
+            Swal.fire({
+                icon: notif.icon,
+                title: notif.title,
+                html: notif.text,
+                timer: 10000,
+                showConfirmButton: false
+            });
+        </script>
+        <?php endif; ?>
 
         <!-- Registration Form -->
         <form method="POST" action="<?= site_url('/register'); ?>" class="grid grid-cols-1 md:grid-cols-2 gap-4">
