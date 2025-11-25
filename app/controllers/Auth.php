@@ -112,6 +112,15 @@ public function send_confirmation_email($email, $token)
         $mail->SMTPSecure = getenv('SMTP_SECURE') ?: 'tls';
         $mail->Port       = getenv('SMTP_PORT') ?: 587;
 
+        
+        $mail->SMTPOptions = [
+        'ssl' => [
+                'verify_peer'       => false,
+                'verify_peer_name'  => false,
+                'allow_self_signed' => true
+            ]
+        ];
+
         $mail->setFrom(
             getenv('SMTP_USERNAME') ?: 'bsitjeremyfestin@gmail.com',
             getenv('SMTP_FROM_NAME') ?: 'Voting System Admin'
@@ -361,18 +370,22 @@ private function send_password_token_to_email($email, $token) {
     $mail = new PHPMailer(true);
     try {
         $mail->isSMTP();
-        $mail->Host       = getenv('SMTP_HOST') ?: 'smtp.gmail.com';
+        $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
         $mail->Username   = getenv('SMTP_USERNAME') ?: 'bsitjeremyfestin@gmail.com';
         $mail->Password   = getenv('SMTP_PASSWORD') ?: 'mlfmsmkkuppbcjgf';
-        $mail->SMTPSecure = getenv('SMTP_SECURE') ?: 'tls';
-        $mail->Port       = getenv('SMTP_PORT') ?: 587;
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port       = 587;
 
-        $mail->setFrom(
-            getenv('SMTP_USERNAME') ?: 'bsitjeremyfestin@gmail.com',
-            getenv('SMTP_FROM_NAME') ?: 'Voting System Admin'
-        );
+        $mail->SMTPOptions = [
+        'ssl' => [
+            'verify_peer'       => false,
+            'verify_peer_name'  => false,
+            'allow_self_signed' => true
+        ]
+    ];
 
+        $mail->setFrom(getenv('SMTP_USERNAME') ?: 'bsitjeremyfestin@gmail.com', 'Voting System Admin');
         $mail->addAddress($email);
 
         $mail->isHTML(true);
