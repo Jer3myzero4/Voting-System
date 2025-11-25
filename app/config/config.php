@@ -79,7 +79,7 @@ $config['ENVIRONMENT']             = 'development';
 | WARNING: You MUST set this value!
 |
 */
-$config['base_url'] 				= 'https://voting-system-50f6.onrender.com';
+$config['base_url'] 				= 'https://voting-system-50f6.onrender.com/';
 
 /*
 |--------------------------------------------------------------------------
