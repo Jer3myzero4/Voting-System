@@ -104,14 +104,15 @@ public function send_confirmation_email($email, $token)
     try {
         
         $mail->isSMTP();
+
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
-        $mail->Username   = 'bsitjeremyfestin@gmail.com';
-        $mail->Password   = 'mlfmsmkkuppbcjgf'; 
+        $mail->Username   = getenv('SMTP_USERNAME') ?: 'bsitjeremyfestin@gmail.com';
+        $mail->Password   = getenv('SMTP_PASSWORD') ?: 'mlfmsmkkuppbcjgf';
         $mail->SMTPSecure = 'tls';
         $mail->Port       = 587;
 
-        $mail->setFrom('bsitjeremyfestin@gmail.com', 'Voting System Admin');
+        $mail->setFrom(getenv('SMTP_USERNAME') ?: 'bsitjeremyfestin@gmail.com', 'Voting System Admin');
         $mail->addAddress($email);
 
         $mail->isHTML(true);
@@ -360,12 +361,12 @@ private function send_password_token_to_email($email, $token) {
         $mail->isSMTP();
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
-        $mail->Username   = 'bsitjeremyfestin@gmail.com'; 
-        $mail->Password   = 'mlfmsmkkuppbcjgf';   // Gmail App Password
+        $mail->Username   = getenv('SMTP_USERNAME') ?: 'bsitjeremyfestin@gmail.com';
+        $mail->Password   = getenv('SMTP_PASSWORD') ?: 'mlfmsmkkuppbcjgf';
         $mail->SMTPSecure = 'tls';
         $mail->Port       = 587;
 
-        $mail->setFrom('bsitjeremyfestin@gmail.com', 'Voting System');
+        $mail->setFrom(getenv('SMTP_USERNAME') ?: 'bsitjeremyfestin@gmail.com', 'Voting System Admin');
         $mail->addAddress($email);
 
         $mail->isHTML(true);
