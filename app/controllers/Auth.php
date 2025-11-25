@@ -109,7 +109,7 @@ public function send_confirmation_email($email, $token)
         $mail->Username   = 'bsitjeremyfestin@gmail.com';
         $mail->Password   = 'mlfmsmkkuppbcjgf'; 
         $mail->SMTPSecure = 'tls';
-        $mail->Port       = 465;
+        $mail->Port       = 587;
 
         $mail->setFrom('bsitjeremyfestin@gmail.com', 'Voting System Admin');
         $mail->addAddress($email);
@@ -363,7 +363,7 @@ private function send_password_token_to_email($email, $token) {
         $mail->Username   = 'bsitjeremyfestin@gmail.com'; 
         $mail->Password   = 'mlfmsmkkuppbcjgf';   // Gmail App Password
         $mail->SMTPSecure = 'tls';
-        $mail->Port       = 465;
+        $mail->Port       = 587;
 
         $mail->setFrom('bsitjeremyfestin@gmail.com', 'Voting System');
         $mail->addAddress($email);
