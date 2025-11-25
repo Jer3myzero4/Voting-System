@@ -102,25 +102,26 @@ private function send_confirmation_email($email, $token)
 {
     $mail = new PHPMailer(true);
     try {
-        // SMTP configuration
+        // Enable verbose debug output (remove in production)
+        $mail->SMTPDebug = 0; // Set 2 for debug
         $mail->isSMTP();
-        $mail->Host       = 'smtp.gmail.com';
+        $mail->Host       = 'smtp.gmail.com';       // Gmail SMTP server
         $mail->SMTPAuth   = true;
-        $mail->Username   = 'bsitjeremyfestin@gmail.com';  // Your Gmail
-        $mail->Password   = 'mlfmsmkkuppbcjgf';           // Gmail App Password
+        $mail->Username   = 'bsitjeremyfestin@gmail.com'; // Your Gmail
+        $mail->Password   = 'mlfmsmkkuppbcjgf';           // Your Gmail App Password
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // TLS encryption
-        $mail->Port       = 587;
+        $mail->Port       = 587;                         // TLS port
 
         // Sender & Recipient
         $mail->setFrom('bsitjeremyfestin@gmail.com', 'Voting System Admin');
         $mail->addAddress($email);
 
-        // Email content
+        // Email format
         $mail->isHTML(true);
         $mail->Subject = 'Confirm Your Email Address';
 
-        $base = rtrim(base_url(), '/') . '/';
-        $confirm_url = $base . 'confirm_email/' . urlencode($token);
+        $base = rtrim(base_url(), '/'); 
+        $confirm_url = $base . '/confirm_email/' . urlencode($token);
 
         $mail->Body = "
             <h2>Welcome to Voting System for High School Student Officer Elections!</h2>
@@ -132,18 +133,17 @@ private function send_confirmation_email($email, $token)
             <p>Thank you,<br>Voting System Admin</p>
         ";
 
+        // Send email
         $mail->send();
         error_log("✅ Confirmation email sent to: $email");
         return true;
+
     } catch (Exception $e) {
         error_log("❌ Email could not be sent. PHPMailer Error: {$mail->ErrorInfo}");
         return false;
     }
 }
 
-
-
-    
 
 
 
@@ -364,7 +364,8 @@ private function send_password_token_to_email($email, $token) {
         $mail->SMTPAuth   = true;
         $mail->Username   = 'bsitjeremyfestin@gmail.com'; 
         $mail->Password   = 'mlfmsmkkuppbcjgf';   // Gmail App Password
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // TLS encryption
+        $mail->SMTPSecure = 'tls';
+        $mail->Port       = 587;
 
         $mail->setFrom('bsitjeremyfestin@gmail.com', 'Voting System');
         $mail->addAddress($email);
