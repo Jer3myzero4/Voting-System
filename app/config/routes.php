@@ -48,7 +48,6 @@ $router->get('/', 'Home::index');
 $router->get('/homepage', 'Home::index');
 
 
-$router->get('/logout', 'Auth::logout');
 
 
 
