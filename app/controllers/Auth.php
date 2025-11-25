@@ -107,7 +107,7 @@ public function send_confirmation_email($email, $token)
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
         $mail->Username   = 'bsitjeremyfestin@gmail.com';
-       $mail->Password = getenv('BREVO_SMTP_KEY');
+        $mail->Password   = 'mlfmsmkkuppbcjgf'; 
         $mail->SMTPSecure = 'tls';
         $mail->Port       = 587;
 
@@ -121,7 +121,7 @@ public function send_confirmation_email($email, $token)
         $base = rtrim(base_url(), '/') . '/';
 
         
-        $confirm_url = $base . 'confirm_email/' . urlencode($token);
+        $confirm_url = $base . 'https://voting-system-50f6.onrender.com/confirm_email/' . urlencode($token);
 
         $mail->Body = "
             <h2>Welcome to Voting System For HighSchool Student Officer Elections!</h2>
@@ -361,8 +361,7 @@ private function send_password_token_to_email($email, $token) {
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
         $mail->Username   = 'bsitjeremyfestin@gmail.com'; 
-       $mail->Password = getenv('BREVO_SMTP_KEY');
-
+        $mail->Password   = 'mlfmsmkkuppbcjgf';   // Gmail App Password
         $mail->SMTPSecure = 'tls';
         $mail->Port       = 587;
 
