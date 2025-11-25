@@ -23,8 +23,8 @@ class Auth extends Controller
     $mail->Username   = 'bsitjeremyfestin@gmail.com';
     $mail->Password   = 'ggiaprsfgtpfgswn'; // Gmail App Password
                        
-   $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
-    $mail->Port       = 465;
+   $mail->SMTPSecure =  PHPMailer::ENCRYPTION_STARTTLS;
+    $mail->Port       = 587;
 
     // Sender email
     $mail->setFrom('bsitjeremyfestin@gmail.com', 'Voting System Admin');
