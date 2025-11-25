@@ -18,6 +18,8 @@ class Auth extends Controller
 
      public function index() {
         $this->call->view('auth/login');
+
+        
     }  
 
 
@@ -101,9 +103,13 @@ class Auth extends Controller
    
 public function send_confirmation_email($email, $token)
 {
-    // Create SendGrid email object
     $emailObj = new \SendGrid\Mail\Mail();
-    $emailObj->setFrom(getenv('SENDGRID_FROM_EMAIL'), getenv('SENDGRID_FROM_NAME'));
+
+    // fix: setFrom with fallback
+    $fromEmail = getenv('SENDGRID_FROM_EMAIL') ?: "bsitjeremyfestin@gmail.com";
+    $fromName  = getenv('SENDGRID_FROM_NAME') ?: "Voting System Admin";
+
+    $emailObj->setFrom($fromEmail, $fromName);
     $emailObj->setSubject('Confirm Your Email Address');
     $emailObj->addTo($email);
 
@@ -111,34 +117,32 @@ public function send_confirmation_email($email, $token)
     $confirm_url = $base . 'confirm_email/' . urlencode($token);
 
     $emailObj->addContent(
-        "text/plain", 
-        "Welcome to Voting System For HighSchool Student Officer Elections!\n
+        "text/plain",
+        "Welcome!
+
         Click this link to confirm your email: $confirm_url"
     );
 
     $emailObj->addContent(
-        "text/html", 
-        "<h2>Welcome to Voting System For HighSchool Student Officer Elections!</h2>
+        "text/html",
+        "<h2>Welcome!</h2>
         <p>Click the button below to confirm your email:</p>
         <a href='$confirm_url' style='background-color:#28a745;color:#fff;padding:10px 20px;text-decoration:none;border-radius:5px;'>Confirm Email</a>
-        <p>If the button doesn’t work, copy this link into your browser:</p>
-        <p>$confirm_url</p>
-        <br>
-        <p>Thank you,<br>Voting System For HighSchool Student Official</p>"
+        <p>Or copy this link:</p>
+        <p>$confirm_url</p>"
     );
 
-    // Initialize SendGrid
     $sendgrid = new \SendGrid(getenv('SENDGRID_API_KEY'));
 
     try {
         $response = $sendgrid->send($emailObj);
         if ($response->statusCode() == 202) {
-            error_log("✅ Email sent successfully to: " . $email);
+            error_log("Email sent successfully to: " . $email);
         } else {
-            error_log("❌ Email sending failed. Status Code: " . $response->statusCode());
+            error_log("Email failed. Status: " . $response->statusCode());
         }
     } catch (Exception $e) {
-        error_log("❌ Exception while sending email: " . $e->getMessage());
+        error_log("SendGrid Exception: " . $e->getMessage());
     }
 }
 

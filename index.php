@@ -91,7 +91,10 @@ $dotenv = Dotenv\Dotenv::createImmutable(ROOT_DIR);
 $dotenv->load();
 
 
+
 require_once SYSTEM_DIR . 'kernel/LavaLust.php';
+
+
 // Load Composer autoloader
 
 
