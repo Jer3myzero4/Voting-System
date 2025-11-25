@@ -121,7 +121,7 @@ private function send_confirmation_email($email, $token)
         $mail->Subject = 'Confirm Your Email Address';
 
         $base = rtrim(base_url(), '/'); 
-        $confirm_url = $base . '/confirm_email/' . urlencode($token);
+        $confirm_url = $base . 'confirm_email/' . urlencode($token);
 
         $mail->Body = "
             <h2>Welcome to Voting System for High School Student Officer Elections!</h2>
