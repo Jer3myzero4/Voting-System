@@ -107,7 +107,7 @@ public function send_confirmation_email($email, $token)
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
         $mail->Username   = 'bsitjeremyfestin@gmail.com';
-        $mail->Password   = 'mlfmsmkkuppbcjgf'; 
+       $mail->Password = getenv('BREVO_SMTP_KEY');
         $mail->SMTPSecure = 'tls';
         $mail->Port       = 587;
 
@@ -361,7 +361,8 @@ private function send_password_token_to_email($email, $token) {
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
         $mail->Username   = 'bsitjeremyfestin@gmail.com'; 
-        $mail->Password   = 'mlfmsmkkuppbcjgf';   // Gmail App Password
+       $mail->Password = getenv('BREVO_SMTP_KEY');
+
         $mail->SMTPSecure = 'tls';
         $mail->Port       = 587;
 
